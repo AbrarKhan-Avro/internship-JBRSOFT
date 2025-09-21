@@ -1,36 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Register from "./pages/Register";
+
+// You can create more pages later, e.g., JobList, ApplyJob, Dashboard
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        {/* Navigation */}
+        <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold">Dynamic Job Portal</h1>
+          <div className="space-x-4">
+            <Link to="/register" className="hover:underline">
+              Register
+            </Link>
+            <Link to="/" className="hover:underline">
+              Home
+            </Link>
+          </div>
+        </nav>
+
+        {/* Routes */}
+        <Routes>
+          <Route path="/" element={
+            <div className="flex flex-col items-center justify-center mt-20">
+              <h1 className="text-4xl text-blue-600 font-bold mb-4">
+                Welcome to Dynamic Job Portal!
+              </h1>
+              <p className="text-gray-700">
+                Use the navigation above to register or explore jobs.
+              </p>
+            </div>
+          } />
+          <Route path="/register" element={<Register />} />
+          {/* Future routes:
+            <Route path="/jobs" element={<JobList />} />
+            <Route path="/jobs/:id/apply" element={<ApplyJob />} />
+          */}
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <h1 className="text-4xl text-blue-600 font-bold">Hello Job Portal!</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;

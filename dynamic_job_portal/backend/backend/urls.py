@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import path, include
 
 def hello(request):
     return JsonResponse({"message": "Hello from Django!"})
 
 urlpatterns = [
+    path("admin/", admin.site.urls),   # This enables the admin panel
     path("api/hello/", hello),
+    path('api/', include('portal.urls')),
 ]
