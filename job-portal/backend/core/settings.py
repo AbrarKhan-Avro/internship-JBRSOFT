@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Your apps (uncomment / add apps as you create them)
-    # "jobs",
+    "jobs",
 ]
 
 MIDDLEWARE = [
