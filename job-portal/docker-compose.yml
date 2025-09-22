@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jobportal
+      POSTGRES_USER: jobuser
+      POSTGRES_PASSWORD: jobpass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/code
+    ports:
+      - "8001:8000"   # map host 8001 -> container 8000 because 8000 on host is taken
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=jobportal
+      - DB_USER=jobuser
+      - DB_PASSWORD=jobpass
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DEBUG=1
+
+volumes:
+  pgdata:
