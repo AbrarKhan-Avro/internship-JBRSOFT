@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   db:
     image: postgres:15
@@ -9,24 +10,55 @@ services:
       POSTGRES_PASSWORD: jobpass
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - jobnet
 
   backend:
     build:
       context: ./backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./backend:/code
+      - ./backend:/code                    # bind-mount backend code for live edits
+      - ./media:/code/media                # persist uploaded files to host ./media
     ports:
-      - "8001:8000"   # map host 8001 -> container 8000 because 8000 on host is taken
+      - "8001:8000"                        # host 8001 -> container 8000 (your host's 8000 was taken)
     depends_on:
       - db
     environment:
-      - DB_NAME=jobportal
-      - DB_USER=jobuser
-      - DB_PASSWORD=jobpass
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DEBUG=1
+      DB_NAME: jobportal
+      DB_USER: jobuser
+      DB_PASSWORD: jobpass
+      DB_HOST: db
+      DB_PORT: "5432"
+      DEBUG: "1"
+      # If you prefer to manage secrets with an env file, replace above with env_file: ./.env.backend
+    restart: unless-stopped
+    networks:
+      - jobnet
+
+  frontend:
+    build:
+      context: ./frontend
+    # For dev-friendly workflow, mount the source so you can edit locally.
+    volumes:
+      - ./frontend:/app
+      # You can optionally mount node_modules to speed build on some setups:
+      # - frontend_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"                         # host 5173 -> container 5173 (Vite/serve)
+    depends_on:
+      - backend
+    environment:
+      # frontend will prefer VITE_API_URL env var. Inside Docker, backend service is reachable at http://backend:8000
+      VITE_API_URL: "http://backend:8000/api"
+    restart: unless-stopped
+    networks:
+      - jobnet
 
 volumes:
   pgdata:
+  # frontend_node_modules: {}   # uncomment if you add node_modules mount
+
+networks:
+  jobnet:
+    driver: bridge
