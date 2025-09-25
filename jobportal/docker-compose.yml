@@ -11,7 +11,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"    # 🔹 host 5433 -> container 5432
+      - "5433:5432"
 
   backend:
     build:
@@ -24,9 +24,18 @@ services:
     depends_on:
       - db
     ports:
-      - "8001:8000"    # host 8001 -> container 8000 (your 8000 is busy)
+      - "8001:8000"
     command: >
       sh -c "python manage.py migrate --noinput || true && python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"   # host 5173 -> container 5173
     restart: unless-stopped
 
 volumes:
