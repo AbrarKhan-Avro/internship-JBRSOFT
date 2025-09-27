@@ -4,6 +4,7 @@ import axios from "axios";
 export default function DynamicForm({ slug }) {
   const [page, setPage] = useState(null);
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -22,10 +23,32 @@ export default function DynamicForm({ slug }) {
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // clear field error as user types
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    page.fields.forEach((field) => {
+      if (field.required) {
+        const value = formData[field.name];
+        if (
+          value === undefined ||
+          value === "" ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          newErrors[field.name] = `${field.label} is required`;
+        }
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     axios
       .post(`http://localhost:8001/api/pages/${slug}/submit/`, formData)
       .then(() => setMessage("✅ Form submitted successfully!"))
@@ -54,13 +77,19 @@ export default function DynamicForm({ slug }) {
         {page.fields.map((field) => {
           const commonProps = {
             name: field.name,
-            required: field.required,
             placeholder: field.placeholder,
             value: formData[field.name] || "",
             onChange: (e) => handleChange(field.name, e.target.value),
-            className:
-              "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+            className: `w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+              errors[field.name]
+                ? "border-red-500 focus:ring-red-400"
+                : "border-gray-300 focus:ring-blue-500"
+            }`,
           };
+
+          const errorMsg = errors[field.name] && (
+            <p className="text-red-500 text-sm mt-1">{errors[field.name]}</p>
+          );
 
           switch (field.field_type) {
             case "textarea":
@@ -68,6 +97,7 @@ export default function DynamicForm({ slug }) {
                 <div key={field.id} className="flex flex-col">
                   <label className="font-semibold mb-2">{field.label}</label>
                   <textarea {...commonProps} rows="4" />
+                  {errorMsg}
                 </div>
               );
 
@@ -83,6 +113,7 @@ export default function DynamicForm({ slug }) {
                       </option>
                     ))}
                   </select>
+                  {errorMsg}
                 </div>
               );
 
@@ -107,6 +138,7 @@ export default function DynamicForm({ slug }) {
                       </label>
                     ))}
                   </div>
+                  {errorMsg}
                 </div>
               );
 
@@ -140,6 +172,7 @@ export default function DynamicForm({ slug }) {
                       </label>
                     ))}
                   </div>
+                  {errorMsg}
                 </div>
               );
 
@@ -148,6 +181,7 @@ export default function DynamicForm({ slug }) {
                 <div key={field.id} className="flex flex-col">
                   <label className="font-semibold mb-2">{field.label}</label>
                   <input type={field.field_type} {...commonProps} />
+                  {errorMsg}
                 </div>
               );
           }
