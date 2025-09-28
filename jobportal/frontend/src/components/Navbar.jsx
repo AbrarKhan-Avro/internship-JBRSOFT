@@ -15,7 +15,8 @@ export default function Navbar() {
           <a href="/page/Login" className="hover:text-yellow-400">Login</a>
         </li>
         <li>
-          <a href="/page/Job Post" className="hover:text-yellow-400">Jobs</a>
+          {/* ✅ Correct single Jobs link */}
+          <a href="/jobs" className="hover:text-yellow-400">Jobs</a>
         </li>
         <li>
           <a href="/page/Contact" className="hover:text-yellow-400">Contact</a>

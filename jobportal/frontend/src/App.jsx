@@ -10,6 +10,7 @@ import axios from "axios";
 import DynamicForm from "./components/DynamicForm";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import JobListings from "./components/JobListings";
 
 // ✅ Home Page – fetch list of dynamic pages from backend
 function Home() {
@@ -64,6 +65,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/:slug" element={<PageForm />} />
+            <Route path="/jobs" element={<JobListings />} />
           </Routes>
         </main>
 

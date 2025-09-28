@@ -1,23 +1,20 @@
-"""
-URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from forms_engine.views import (
+    PageListView,
+    PageDetailView,
+    SubmitFormView,
+)
+from forms_engine.api_views import page_submissions   # ✅ keep your new endpoint
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("forms_engine.urls")),  # ✅ our API
+
+    # ✅ Corrected API endpoints
+    path("api/pages/", PageListView.as_view(), name="page-list"),
+    path("api/pages/<slug:slug>/", PageDetailView.as_view(), name="page-detail"),
+    path("api/pages/<slug:slug>/submit/", SubmitFormView.as_view(), name="page-submit"),
+
+    # ✅ New endpoint for job listings
+    path("api/pages/<slug:slug>/submissions/", page_submissions, name="page-submissions"),
 ]
