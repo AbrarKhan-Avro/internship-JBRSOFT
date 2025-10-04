@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: jobportal_db
+      POSTGRES_USER: jobportal_user
+      POSTGRES_PASSWORD: jobportal_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # map to host 5433 to avoid common 5432 conflicts
+    ports:
+      - "5433:5432"
+
+  web:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/code
+    environment:
+      - DJANGO_DB_HOST=db
+      - DJANGO_DB_NAME=jobportal_db
+      - DJANGO_DB_USER=jobportal_user
+      - DJANGO_DB_PASSWORD=jobportal_pass
+      - DJANGO_SECRET_KEY=replace-me-with-a-secure-key
+    ports:
+      # host:container -> Django default port 8000 inside container exposed as 8001 on your Windows host
+      - "8001:8000"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
