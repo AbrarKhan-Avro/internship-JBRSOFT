@@ -50,12 +50,13 @@ export default function PostJob() {
         body: formPayload,
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         setMessage("✅ Job posted successfully!");
         setFormData({});
       } else {
-        const errData = await response.json();
-        setMessage(`❌ Error: ${JSON.stringify(errData.errors || errData)}`);
+        setMessage(`❌ Error: ${JSON.stringify(data.errors || data)}`);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -75,66 +76,88 @@ export default function PostJob() {
           .map((field) => {
             const { name, label, field_type, placeholder, required, options } = field;
 
-            switch (field_type) {
-              case "text":
-              case "email":
-              case "password":
-              case "number":
-              case "date":
-                return (
-                  <div key={name}>
-                    <label className="block font-medium mb-1">{label}</label>
-                    <input
-                      type={field_type}
-                      name={name}
-                      placeholder={placeholder}
-                      required={required}
-                      value={formData[name] || ""}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                );
-
-              case "textarea":
-                return (
-                  <div key={name}>
-                    <label className="block font-medium mb-1">{label}</label>
-                    <textarea
-                      name={name}
-                      placeholder={placeholder}
-                      required={required}
-                      value={formData[name] || ""}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded h-24"
-                    />
-                  </div>
-                );
-
-              case "dropdown":
-                return (
-                  <div key={name}>
-                    <label className="block font-medium mb-1">{label}</label>
-                    <select
-                      name={name}
-                      required={required}
-                      onChange={handleChange}
-                      className="w-full p-2 border rounded"
-                      value={formData[name] || ""}
-                    >
-                      <option value="">-- Select --</option>
-                      {field.options?.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.option_text}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                );
-
-              default:
-                return null;
+            // Text-like fields
+            if (["text", "email", "password", "number", "date"].includes(field_type)) {
+              return (
+                <div key={name}>
+                  <label className="block font-medium mb-1">{label}</label>
+                  <input
+                    type={field_type}
+                    name={name}
+                    placeholder={placeholder}
+                    required={required}
+                    value={formData[name] || ""}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              );
             }
+
+            // Textarea
+            if (field_type === "textarea") {
+              return (
+                <div key={name}>
+                  <label className="block font-medium mb-1">{label}</label>
+                  <textarea
+                    name={name}
+                    placeholder={placeholder}
+                    required={required}
+                    value={formData[name] || ""}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded h-24"
+                  />
+                </div>
+              );
+            }
+
+            // Select / Dropdown
+            if (field_type === "select" || field_type === "dropdown") {
+              return (
+                <div key={name}>
+                  <label className="block font-medium mb-1">{label}</label>
+                  <select
+                    name={name}
+                    required={required}
+                    onChange={handleChange}
+                    value={formData[name] || ""}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">-- Select --</option>
+                    {options?.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label || opt.value}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+            }
+
+            // Radio / Checkbox
+            if (["radio", "checkbox"].includes(field_type)) {
+              return (
+                <div key={name}>
+                  <label className="block font-medium mb-1">{label}</label>
+                  <div className="flex flex-col space-y-1">
+                    {options?.map((opt) => (
+                      <label key={opt.value} className="inline-flex items-center space-x-2">
+                        <input
+                          type={field_type}
+                          name={name}
+                          value={opt.value}
+                          required={required && field_type === "radio"}
+                          onChange={handleChange}
+                        />
+                        <span>{opt.label || opt.value}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            return null;
           })}
 
         <button
