@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'corsheaders',
+    
+    # Local apps
+    'forms_engine',
 ]
 
 MIDDLEWARE = [
