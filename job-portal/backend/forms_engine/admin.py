@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Page, Field, FieldOption
+from .models import FormSubmission
 
 
 class FieldOptionInline(admin.TabularInline):
@@ -29,3 +30,10 @@ class FieldAdmin(admin.ModelAdmin):
 @admin.register(FieldOption)
 class FieldOptionAdmin(admin.ModelAdmin):
     list_display = ('label', 'value', 'field')
+
+
+@admin.register(FormSubmission)
+class FormSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('page', 'submitted_at')
+    readonly_fields = ('page', 'data', 'submitted_at')
+    ordering = ('-submitted_at',)

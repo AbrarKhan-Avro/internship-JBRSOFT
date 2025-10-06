@@ -1,10 +1,15 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Page(models.Model):
     """Each page like Registration, Login, Profile, etc."""
     name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True, help_text="Used in URL, e.g. 'registration'")
+    slug = models.SlugField(
+        max_length=100,
+        unique=True,
+        help_text="Used in URL, e.g. 'registration'"
+    )
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -58,3 +63,18 @@ class FieldOption(models.Model):
 
     def __str__(self):
         return f"{self.field.label} -> {self.label}"
+
+
+class FormSubmission(models.Model):
+    """Stores user-submitted data for each dynamic page."""
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='submissions')
+    data = models.JSONField()  # Stores dynamic form data as JSON (field_name: value)
+    submitted_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-submitted_at']
+        verbose_name = "Form Submission"
+        verbose_name_plural = "Form Submissions"
+
+    def __str__(self):
+        return f"Submission for {self.page.name} at {self.submitted_at.strftime('%Y-%m-%d %H:%M:%S')}"
