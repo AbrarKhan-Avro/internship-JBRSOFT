@@ -6,6 +6,7 @@ import Profile from "./pages/Dashboard/Profile";
 import Jobs from "./pages/Dashboard/Jobs";
 import PostJob from "./pages/Dashboard/PostJob";
 import About from "./pages/Dashboard/About";
+import ApplyJob from "./pages/ApplyJob"; // ✅ NEW PAGE
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -13,12 +14,13 @@ function App() {
 
   return (
     <Routes>
-      {/* Public routes */}
+      {/* 🌐 Public routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/apply" element={<ApplyJob />} /> {/* ✅ Added ApplyJob route */}
 
-      {/* Authenticated routes */}
+      {/* 🔒 Authenticated routes */}
       {user ? (
         <Route
           path="/dashboard/*"
@@ -39,7 +41,7 @@ function App() {
         <Route path="/dashboard/*" element={<Navigate to="/login" />} />
       )}
 
-      {/* Catch-all */}
+      {/* 🚦 Catch-all redirect */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

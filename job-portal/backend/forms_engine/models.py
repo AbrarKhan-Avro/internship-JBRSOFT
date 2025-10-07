@@ -1,6 +1,16 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
+class Job(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    job_type = models.CharField(max_length=50)  # Full-time, Part-time, etc.
+    posted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
 
 class Page(models.Model):
     """Each page like Registration, Login, Profile, etc."""

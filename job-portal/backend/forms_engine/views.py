@@ -6,7 +6,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .models import Page, Field, FormSubmission
 from .serializers import FormSubmissionSerializer
-
+from .models import Job
+from .serializers import JobSerializer
+from rest_framework.decorators import api_view
+from .models import FormSubmission
 
 class PageListView(generics.ListAPIView):
     """List all available pages (Registration, Login, etc.)"""
@@ -51,3 +54,9 @@ class FormSubmissionView(APIView):
         serializer = FormSubmissionSerializer(submission)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+def list_jobs(request):
+    """Return all submitted job posts."""
+    submissions = FormSubmission.objects.filter(page__slug="post-job").order_by("-submitted_at")
+    serializer = FormSubmissionSerializer(submissions, many=True)
+    return Response(serializer.data)

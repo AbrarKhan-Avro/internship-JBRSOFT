@@ -1,5 +1,18 @@
 from rest_framework import serializers
 from .models import Page, Field, FieldOption, FormSubmission
+from .models import Job
+from .models import FormSubmission
+
+class FormSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FormSubmission
+        fields = "__all__"
+
+
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = "__all__"
 
 
 class FieldOptionSerializer(serializers.ModelSerializer):
